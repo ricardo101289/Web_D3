@@ -1,0 +1,13 @@
+body {
+  background-color : #EDE9E6;
+}
+
+#chart {
+    margin: 40px;
+  
+    .axis path, .axis line, path.domain {
+        fill: none;
+        stroke: #ababab;
+        stroke-width: 1 ;
+    }
+}

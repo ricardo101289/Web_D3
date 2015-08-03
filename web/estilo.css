@@ -1,0 +1,107 @@
+body {
+  background: #EDE9E6;
+}
+#chart {
+  height: 400px;
+  width: 650px;
+}
+div#botones{
+	margin-left: 590px;
+}
+div#chart{
+	margin-left: 190px;
+}
+div#sub{
+	padding-top: 20px;
+	margin-top: 450px;
+}
+.grid .tick {
+	stroke: lightgrey;
+	opacity: 0.7;
+	shape-rendering: crispEdges;
+}
+ 
+.grid path {
+	stroke-width: 0;
+}
+ 
+.axis path {
+	fill: none;
+	stroke: #bbb;
+	shape-rendering: crispEdges;
+}
+ 
+.axis text {
+	fill: #555;
+}
+ 
+.axis line {	
+	stroke: #e7e7e7;
+	shape-rendering: crispEdges;
+}
+ 
+.axis .axis-label {
+	font-size: 14px;
+}
+ 
+.line {
+	fill: none;
+	stroke-width: 1.5px;
+}
+ 
+.dot {
+	/* consider the stroke-with the mouse detect radius? */
+	stroke: transparent;
+	stroke-width: 10px;  
+	cursor: pointer;
+}
+ 
+.dot:hover {
+	stroke: rgba(68, 127, 255, 0.3);
+}
+h1 {
+  margin: 0;
+  padding: 0.1rem 0.4rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+.widget {
+  display: inline-block;
+  border: 1px solid #AAA;
+  background: white;
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: #A18FDB;
+}
+
+.value {
+  font-size: 16px;
+  font-weight: 300;
+  fill: #333;
+}
+
+.label {
+  font-size: 18px;
+  fill: #333;
+}
+
+.axis {
+  path {
+    fill: none;
+    //stroke: #333;
+  }
+  .tick line {
+    stroke-width: 1;
+    stroke: rgba(0,0,0,0.1);
+  }
+  //fill: #333;
+  font-size: 12px;
+}
+

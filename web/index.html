@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head id="head">
+<style type="text/css">
+	body{
+	}
+</style>
+	<title></title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<link rel="stylesheet" type="text/css" href="estilo.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<meta charset="utf-8">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+</head>
+<body style="background:#EDE9E6">
+<div align="center"><a href="http://bit.ly/mn5TN" title="Universidad Técnica Particular de Loja"  target="_blank"><img src="http://bit.ly/ZSCurF" border="0" height="250px" width="80%"></a></div>
+<div class="col-lg-12">
+                    
+                    <div ></div>
+                    <div class="intro-text" id="general" align="center">
+                        <span class="name"><h2>Proyecto Ingeniería Web</h2></span>
+                        <img class="img-responsive" src="profile.png" alt="">
+                        <hr class="star-light">
+                        <span class="skills">Web Developer - Graphic Artist - D3</span>
+
+
+                    </div>
+</div>
+<div id ="botones" align="center" class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="Pastel"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#page-top">
+                <select id ="dataset">
+                    <option value="Articulos">Articulos</option>
+                    <option value="Libros">Libros</option>
+                </select>
+                <input type="button" id="opcion" value="Enviar">
+
+                </a>
+                <div id ="figuras" align="center"></div>                
+</div>
+<div align="center" id="sub"></div>
+<div id ="graficas"></div>
+<div id ="articulos_anios"></div><br>
+
+
+
+<script>
+jQuery(document).ready(function($) {
+                $("#opcion").on("click", function(){
+                    console.log("jQuery");
+                    var tag;
+                    tag = $("#dataset").val();
+                    console.log(tag);
+                    if (tag == "Libros") {
+                        jQuery.ajax({
+                            url: 'http://carbono.utpl.edu.ec:8080/RESTFUL_SICA/webresources/entidades.librospublicados/listar?jsoncallback=?',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {},
+                            complete: function(xhr, textStatus) {
+                              //called when complete
+                            console.log("complete"+textStatus);
+                                                                },
+                            success: function(data, textStatus, xhr) {
+                            Graficar(data,tag);
+                            },
+                            error: function(xhr, textStatus, errorThrown) {
+                            console.log("error"+textStatus);
+                            //called when there is an error
+                            }});};
+                     if(tag =="Articulos"){
+                        jQuery.ajax({
+                            url: 'http://carbono.utpl.edu.ec:8080/RESTFUL_SICA/webresources/entidades.articulospublicados/listar?jsoncallback=?',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {},
+                            complete: function(xhr, textStatus) {
+                              //called when complete
+                            console.log("complete"+textStatus);
+                                                                },
+                            success: function(data, textStatus, xhr) {
+                            Graficar(data,tag);
+                            },
+                            error: function(xhr, textStatus, errorThrown) {
+                            console.log("error"+textStatus);
+                            //called when there is an error
+                            }});};
+                        
+                    });});
+
+            function Graficar(data, tag){
+                //console.log (JSON.stringify(nodes));
+                if(tag =="Libros"){
+                    $("#ti").remove();
+                    $("#chart").remove();
+                	$("#barras").remove();
+                	$("#Tipo").remove();
+                	$("#editorial").remove();
+                	$("#anios").remove();
+                    $("#figuras").append("<input id ='Tipo' type='button' value='Tipo'><input id ='editorial' type='button' value ='Editorial'><input id ='anios' type='button' value='Años'>");
+                    
+                    $("#Tipo").on("click", function(){
+                        $("#link").remove();
+                        $("#link2").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#ti").remove();
+                    $("#chart").remove();
+                    $("#graficas").append("<div id='ti'><br><h2>Publicaciones por Tipo de Libro</h2></div><div id ='chart'></div>");
+                    	//$("#head").append("<link rel='stylesheet' type='text/css' href='estilo_edi.css'>");
+                    	$("#head").append("<div id ='link'><link rel='stylesheet' type='text/css' href='estilo_edi.css'></div>");
+                    	$("#head").append("<div id ='link2'><link rel='stylesheet' type='text/css' href='estilos_libro.css'></div>");
+                    	graphBar(data);
+                    });
+                    $("#editorial").on("click", function(){
+                        $("#link").remove();
+                        $("#link2").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#ti").remove();
+                    $("#chart").remove();
+                    $("#head").append("<div id='link'><link rel='stylesheet' type='text/css' href='estilo_pastel.css'></div>");
+                    $("#graficas").append("<div id='ti'><br><h2>Publicaciones por Editorial</h2></div><div id ='chart'></div>");
+                    var array = Fabricarjson_editorial(data);
+                    Presentacion2(array);
+                    });
+                    $("#anios").on("click", function(){
+                        $("#link").remove();
+                        $("#link2").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#ti").remove();
+                    $("#chart").remove();
+                    $("#graficas").append("<div id='ti'><br><h2>Publicaciones por Años</h2></div><div id ='chart'></div>");
+                    $("#head").append("<div id ='link'><link rel='stylesheet' type='text/css' href='estilo_anios.css'></div>");
+                    grap(data);
+                    });
+                                }
+                if (tag == "Articulos"){
+                    $("#ti").remove();
+                    $("#link").remove();
+                	$("#Tipo").remove();
+                	$("#barras").remove();
+                	$("#editorial").remove();
+                	$("#anios").remove();
+                    $("#chart").remove();
+                    var gra;
+                    $("#figuras").append("<input id ='anios' type='button' value='Años'><input id ='editorial' type='button' value ='Docentes'><input id ='barras' type='button' value='Lineas'>");
+                    $("#anios").on("click", function(){
+                    	$("#ti").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#chart").remove();
+                    	$("#graficas").append("<div id='ti'><br><h2>Publicaciones por Años</h2></div><div id ='chart'></div>");
+                    	$("#head").append("<div id ='link'><link rel='stylesheet' type='text/css' href='estilo_edi.css'></div>");
+                    	recibe(data);
+                    });
+                    $("#editorial").on("click", function(){
+                        $("#link").remove();
+                    	$("#ti").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#chart").remove();
+                        $("#chart").remove();
+                    	$("#graficas").append("<div id='ti'><br><h2>Publicaciones por Autor</h2></div><div id ='chart'></div>");
+                    	$("#sub").append("<select id ='select'><option value='KARINA ESPERANZA CANON BELTRAN'>KARINA ESPERANZA CANON BELTRAN</option><option value='GONZALO FERNANDO OLMEDO CIFUENTES'>GONZALO FERNANDO OLMEDO CIFUENTES</option><option value='KRUZKAYA ELIZABETH ORDOÑEZ GONZALEZ'>KRUZKAYA ELIZABETH ORDOÑEZ GONZALEZ</option><option value='ABEL ROMEO SUING RUIZ'>ABEL ROMEO SUING RUIZ</option><option value='CARLOS ORTIZ LEON'>CARLOS ORTIZ LEON</option><option value='VERONICA ELIZABETH GONZALEZ RENTERIA'>VERONICA ELIZABETH GONZALEZ RENTERIA</option><option value='MARIA LUJAN GONZALEZ PORTELA'>MARIA LUJAN GONZALEZ PORTELA</option></select><input type='button' id='Graficar' value='Graficar'>");
+                    	$("#head").append("<div ='link'><link rel='stylesheet' type='text/css' href='estilo_edi.css'></div>");
+                    	recibe2(data);
+                    });
+                    $("#barras").on("click", function(){
+                        $("#link").remove();
+                    	$("#ti").remove();
+                    	$("#Graficar").remove();
+                    	$("#select").remove();
+                    	$("#chart").remove();
+                    	$("#graficas").append("<div id='ti'><br><h2>Publicaciones por Países</h2></div><div id ='chart'></div>");
+                    	$("#sub").append("<select id ='select'><option value=''>nada</option><option value='Ecuador'>Ecuador</option><option value='Italia'>Italia</option><option value='Países Bajos, Holanda'>Países Bajos, Holanda</option><option value='Argentina'>Argentina</option><option value='Bélgica'>Bélgica</option><option value='Colombia'>Colombia</option><option value='México'>México</option></select><input type='button' id='Graficar' value='Graficar'>");
+                    	$("#head").append("<div id='link'><link rel='stylesheet' type='text/css' href='estilo_edi.css'></div>");
+                    recibe3(data);
+                    });
+                    
+                }  
+            }
+
+			function Presentacion2(dataSet){
+                //var vis = d3.select("#svgVisualize");
+                var canvasWidth = 750, //width
+                canvasHeight = 600,   //height
+                outerRadius = 150,   //radius
+                color = d3.scale.category20();
+                var vis = d3.select("#chart")
+                .append("svg:svg") //create the SVG element inside the <body>
+                .data([dataSet]) //associate our data with the document
+                .attr("width", canvasWidth) //set the width of the canvas
+                .attr("height", canvasHeight) //set the height of the canvas
+                .append("svg:g") //make a group to hold our pie chart
+                .attr("transform", "translate(" + 2.5*outerRadius + "," + 2.5*outerRadius + ")") // relocate center of pie to 'outerRadius,outerRadius'
+
+    // This will create <path> elements for us using arc data...
+                var arc = d3.svg.arc()
+                .outerRadius(outerRadius);
+
+                 var pie = d3.layout.pie() //this will create arc data for us given a list of values
+                .value(function(d) { return d.magnitude; }) // Binding each value to the pie
+                .sort( function(d) { return null; } );
+
+			    // Select all <g> elements with class slice (there aren't any yet)
+			    var arcs = vis.selectAll("g.slice")
+			      // Associate the generated pie data (an array of arcs, each having startAngle,
+			      // endAngle and value properties) 
+			      .data(pie)
+			      // This will create <g> elements for every "extra" data element that should be associated
+			      // with a selection. The result is creating a <g> for every object in the data array
+			      .enter()
+			      // Create a group to hold each slice (we will have a <path> and a <text>
+			      // element associated with each slice)
+			      .append("svg:g")
+			      .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+			    arcs.append("svg:path")
+			      //set the color for each slice to be chosen from the color function defined above
+			      .attr("fill", function(d, i) { return color(i); } )
+			      //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+			      .attr("d", arc);
+
+			    // Add a legendLabel to each arc slice...
+			    arcs.append("svg:text")
+			      .attr("transform", function(d) { //set the label's origin to the center of the arc
+			        //we have to make sure to set these before calling arc.centroid
+			        d.outerRadius = outerRadius + 50; // Set Outer Coordinate
+			        d.innerRadius = outerRadius + 45; // Set Inner Coordinate
+			        return "translate(" + arc.centroid(d) + ")";
+			      })
+			      .attr("text-anchor", "middle") //center the text on it's origin
+			      .style("fill", "Purple")
+			      .style("font", "bold 12px Arial")
+			      .text(function(d, i) { return dataSet[i].legendLabel; }); //get the label from our original data array
+
+			    // Add a magnitude value to the larger arcs, translated to the arc centroid and rotated.
+			    arcs.filter(function(d) { return d.endAngle - d.startAngle > .2; }).append("svg:text")
+			      .attr("dy", ".35em")
+			      .attr("text-anchor", "middle")
+			      //.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")"; })
+			      .attr("transform", function(d) { //set the label's origin to the center of the arc
+			        //we have to make sure to set these before calling arc.centroid
+			        d.outerRadius = outerRadius; // Set Outer Coordinate
+			        d.innerRadius = outerRadius/2; // Set Inner Coordinate
+			        return "translate(" + arc.centroid(d) + ")rotate(" + angle(d) + ")";
+			      })
+			      .style("fill", "White")
+			      .style("font", "bold 12px Arial")
+			      .text(function(d) { return d.data.magnitude; });
+
+			    // Computes the angle of an arc, converting from radians to degrees.
+			    function angle(d) {
+			      var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
+			      return a > 90 ? a - 180 : a;
+			    }color = d3.scale.category20(); //builtin range of colors
+
+			            }
+            function Fabricarjson_editorial(data) {
+                var edi, cont = 0,
+                bandera = 0,
+                prueba = "Editorial UTPL",
+                aux,
+                json = [];
+                var array = ["Oxbow Books","Editorial UTPL","EDILOJA"], array2=[];
+                console.log("entramos en editorial");
+                for(i in data.books){
+                    for(j in data.books){
+                        if (data.books[j].editorial == array[i]) {cont=cont+1};
+                    }if(cont != 0){array2[i]=cont;json[i]={"legendLabel":array[i], "magnitude":array2[i]};}
+                     cont =0;
+                }
+               
+
+
+                for (var i = array2.length - 1; i >= 0; i--) {
+                    console.log(array2[i]);
+                    array2[i];
+                };
+                console.log("json")
+                console.log(JSON.stringify(json));
+                //console.log(array2.length)
+                //console.log(array.length)
+                return json;
+                //json={"name": "Oxbow Books","value":cont};
+                
+                
+            }
+
+            function grap(data){
+				  console.log("data");
+				  var a = crear(data);
+				  var d = [
+				   
+							crear(data)
+				   
+				];
+				console.log(JSON.stringify(d));
+				var tip = d3.tip()
+				  .attr('class', 'd3-tip')
+				  .offset([-10, 0]);
+
+				var RadarChart = {
+				  draw: function(id, d, options){
+				  var cfg = {
+					 radius: 5,
+					 w: 230,
+					 h: 230,
+					 factor: 0.9,
+					 factorLegend: .85,
+				   lineFactor: 1.05,
+					 levels: 4,
+					 maxValue: 0,
+					 radians: 2 * Math.PI,
+					 opacityArea: 0.5,
+					 ToRight: 5,
+					 TranslateX: 80,
+					 TranslateY: 30,
+					 ExtraWidthX: 65,
+					 ExtraWidthY: 65,
+					 color: d3.scale.category10()
+					};
+					
+					if('undefined' !== typeof options){
+					  for(var i in options){
+						if('undefined' !== typeof options[i]){
+						  cfg[i] = options[i];
+						}
+					  }
+					} 
+					cfg.maxValue = Math.max(cfg.maxValue, d3.max(d, function(i){return d3.max(i.map(function(o){return o.value;}))}));
+					var allAxis = (d[0].map(function(i, j){return i.axis}));
+					var total = allAxis.length;
+					var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
+					var Format = d3.format('');
+					d3.select(id).select("svg").remove();
+					
+					var g = d3.select(id)
+							.append("svg")
+							.attr("width", cfg.w+cfg.ExtraWidthX)
+							.attr("height", cfg.h+cfg.ExtraWidthY)
+							.append("g")
+							.attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
+				 
+				  g.call(tip);
+
+					var tooltip;
+				  var rotate = cfg.radians / (total * 2);
+				    
+					// Circular segments
+				  var levelFactor;
+					for(var j=0; j<=cfg.levels; j++){
+					  levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
+					  g.selectAll(".levels")
+					   .data(allAxis)
+					   .enter()
+					   .append("svg:line")
+					   .attr("x1", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(rotate + (i*cfg.radians/total)));})
+					   .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(rotate + (i*cfg.radians/total)));})
+					   .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(rotate + ((i+1)*cfg.radians/total)));})
+					   .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(rotate + ((i+1)*cfg.radians/total)));})
+					   .attr("class", "line")
+				     .attr("stroke-width","1")
+				     .attr("stroke-dasharray", "2,2")
+					   .style("stroke", "grey")
+					   .style("stroke-opacity", "0.75")
+					   .style("stroke-width", "0.6px")
+					   .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+					}    
+				        
+					series = 0;
+
+				  // Grab axis
+					var axis = g.selectAll(".axis")
+							.data(allAxis)
+							.enter()
+							.append("g")
+							.attr("class", "axis");
+				  
+				  // Draw lines
+					axis.append("line")
+						.attr("x1", cfg.w/2)
+						.attr("y1", cfg.h/2)
+						.attr("x2", function(d, i){return cfg.w/2*(1-cfg.lineFactor*Math.sin(rotate + (i*cfg.radians/total)));})
+						.attr("y2", function(d, i){return cfg.h/2*(1-cfg.lineFactor*Math.cos(rotate + (i*cfg.radians/total)));})
+						.attr("class", "line")
+						.style("stroke", "grey")
+						.style("stroke-width", "1px");
+
+				  // Draw labels at end of each line
+					axis.append("text")
+						.attr("class", "legend")
+						.text(function(d){return d})
+						.style("font-family", "sans-serif")
+						.style("font-size", "11px")
+						.attr("text-anchor", "middle")
+						.attr("dy", "1.5em")
+						.attr("transform", function(d, i){return "translate(0, -10)"})
+						.attr("x", function(d, i){return cfg.w/2*(1-cfg.factorLegend*Math.sin(rotate + (i*cfg.radians/total)))-60*Math.sin(rotate + (i*cfg.radians/total));})
+						.attr("y", function(d, i){return cfg.h/2*(1-Math.cos(rotate + (i*cfg.radians/total)))-20*Math.cos(rotate + (i*cfg.radians/total));});
+				 
+				    // Create gradients
+				    var defs = g.append('defs').selectAll('defs').data(allAxis).enter();    
+				    var gradient = defs
+				      .append("linearGradient")
+				      .attr("id", function(d, i){ return "gradient" + i; })
+				      .attr("x1", function(d, i){ return levelFactor *(1-cfg.factor*Math.sin(rotate + (i*cfg.radians/total))); })
+				      .attr("y1", function(d, i){ return levelFactor*(1-cfg.factor*Math.cos(rotate + (i*cfg.radians/total)));})
+				      .attr("x2", function(d, i){ return levelFactor*(1-cfg.factor*Math.sin(rotate + ((i+1)*cfg.radians/total)));})
+				      .attr("y2", function(d, i){ return levelFactor*(1-cfg.factor*Math.cos(rotate + ((i+1)*cfg.radians/total)));})
+				      .attr("gradientUnits", "userSpaceOnUse")
+				      .attr("spreadMethod", "pad");      
+				    gradient.append("svg:stop")
+				        .attr("offset", "0%")
+				        .attr("stop-color", function(d, i){return cfg.BorderColours[i];})
+				        .attr("stop-opacity", 1);
+				    gradient.append("svg:stop")
+				        .attr("offset", "100%")
+				        .attr("stop-color", function(d, i){return cfg.BorderColours[(i+1)%total];})
+				        .attr("stop-opacity", 1);
+				    
+				  // Draw outside border (with gradient)
+				  var levels = g.selectAll(".levels")
+					   .data(allAxis)
+					   .enter();
+
+				  levels.append("svg:line")
+				       .attr("x1", function(d, i){ return levelFactor *(1-cfg.factor*Math.sin(rotate + (i*cfg.radians/total)));})
+				       .attr("y1", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(rotate + (i*cfg.radians/total)));})
+				       .attr("x2", function(d, i){return levelFactor*(1-cfg.factor*Math.sin(rotate + ((i+1)*cfg.radians/total)));})
+				       .attr("y2", function(d, i){return levelFactor*(1-cfg.factor*Math.cos(rotate + ((i+1)*cfg.radians/total)));})
+				       .attr("class", "line")
+				       .attr("id", function(d, i){return "line" + i ;})
+				       .attr("stroke",  function(d, i){ return "url(#gradient" + i + ")"; })
+				       .style("stroke-width", "3px")
+				       .attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");
+
+				  // Draw polygons
+					d.forEach(function(y, x){
+					  dataValues = [];
+					  g.selectAll(".nodes")
+						.data(y, function(j, i){
+						  dataValues.push([
+							cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(rotate + (i*cfg.radians/total))), 
+							cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(rotate + (i*cfg.radians/total)))
+						  ]);
+						});
+					  dataValues.push(dataValues[0]);
+					  g.selectAll(".area")
+					 .data([dataValues])
+					 .enter()
+					 .append("polygon")
+					 .attr("class", "radar-chart-serie" + series)
+					 .style("stroke-width", "1.5px")
+					 .style("stroke", cfg.color(series))
+					 .attr("points",function(d) {
+						 var str="";
+						 for(var pti=0;pti<d.length;pti++){
+							 str=str+d[pti][0]+","+d[pti][1]+" ";
+						 }
+						 return str;
+					  })
+					 .style("fill", function(j, i){return cfg.color(series)})
+					 .style("fill-opacity", cfg.opacityArea)
+					 .on('mouseover', function (d){
+										z = "polygon."+d3.select(this).attr("class");
+										g.selectAll("polygon")
+										 .transition(200)
+										 .style("fill-opacity", 0.4); 
+										g.selectAll(z) 
+										 .transition(200)
+										 .style("fill-opacity", 0.7);
+									  })
+					 .on('mouseout', function(){
+										g.selectAll("polygon")
+										 .transition(200)
+										 .style("fill-opacity", cfg.opacityArea);
+					 });
+						  series++;
+						});
+						series=0;
+
+					  // Draw points at end of polygon
+						d.forEach(function(y, x){
+						  g.selectAll(".nodes").data(y).enter()
+							  .append("svg:circle")
+					      .attr("class", "radar-chart-serie" + series)
+					      .attr('r', cfg.radius)
+					      .attr("alt", function(j){return Math.max(j.value, 0)})
+					      .attr("cx", function(j, i){
+					        dataValues.push([
+					          cfg.w/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.sin(rotate + (i*cfg.radians/total))), 
+					          cfg.h/2*(1-(parseFloat(Math.max(j.value, 0))/cfg.maxValue)*cfg.factor*Math.cos(rotate + (i*cfg.radians/total)))
+					        ]);
+					        return cfg.w/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.sin(rotate + (i*cfg.radians/total)));
+					      })
+					      .attr("cy", function(j, i){
+					        return cfg.h/2*(1-(Math.max(j.value, 0)/cfg.maxValue)*cfg.factor*Math.cos(rotate + (i*cfg.radians/total)));
+					      })
+					      .attr("data-id", function(j){return j.axis})
+					      .style("fill", cfg.color(series))
+					      .style('stroke', 'white')
+					      .style('stroke-width', 3)
+					      .attr('opacity', 0) // hidden by default
+					      .on('mouseover', function (d){ 
+					        var circle = d3.select(this);
+					        circle.transition(200).attr('opacity', 1);
+					        tip.html(d.value).attr('class', 'd3-tip show').show();
+					      })
+					      .on('mouseout', function() {
+					        var circle = d3.select(this);
+					        circle.attr("opacity", 0);
+					        tip.attr('class', 'd3-tip n').hide();
+					      })
+					      .text(function(j){return Math.max(j.value, 0)});
+
+						  series++;
+						});
+
+					  }
+					};
+
+
+					// Make use of script
+
+					var w = 450, 	h = 450;
+					var colorscale = d3.scale.category10();
+					 
+
+					// Options for the Radar chart, other than default
+					var mycfg = {
+					  w: w,
+					  h: h,
+					  maxValue: 0.6,
+					  levels: 3,
+					  ExtraWidthX: 230,
+					  BorderColours: [ "#87F5DC", "#87F5DC", "#FD7D7D", "#FD7D7D", "#FD7D7D", "#FD7D7D", "#67BEE0", "#87F5DC"]
+					}
+
+					// "#87F5DC"  green
+					// "#FD7D7D"  red
+					// "#67BEE0"  blue
+
+					//Call function to draw the Radar chart
+					RadarChart.draw("#chart", d, mycfg);
+
+					var svg = d3.select('#chart')
+						.selectAll('svg')
+						.append('svg')
+						.attr("width", w + 230)
+						.attr("height", h)
+					}
+					function crear(data){
+					  var limite =2016,cont=0,aux=0;
+					  var json =[[]];
+					  var s;
+					  //{axis:"Amazement",value:9},
+					  for(var i=2000;i<limite;i++){
+					  for(j in data.books){
+					     if(data.books[j].year==i){
+					       cont = cont+1;
+					       }
+					    }
+					    s = i.toString();
+					    json[aux]={"axis":s,"value":cont};
+					    aux++;
+					    cont =0;
+					   }
+					 return json;
+					}
+
+            function graphBar(dataset) {
+				  var data, height, margin, svg, width, x, xAxis, y, yAxis;
+				  data = Recorrer_articulos_tipo(dataset);
+				  margin = {
+				    top: 0,
+				    right: 40,
+				    bottom: 100,
+				    left: 50
+				  };
+
+				  width = 600;
+
+				  height = 400;
+
+				  x = d3.scale.ordinal().domain(data.map(function(d) {
+				    return d.name;
+				  })).rangeRoundBands([0, width], .1);
+
+				  y = d3.scale.linear().domain([
+				      0, d3.max(data, function(d) {
+				        return d.value;
+				      })
+				    ])
+				    .range([height, 0]);
+
+				  xAxis = d3.svg
+				    .axis()
+				    .scale(x)
+				    .orient('bottom');
+
+				  yAxis = d3.svg
+				    .axis()
+				    .scale(y)
+				    .orient('left');
+
+				  svg = d3.select('#chart').append('svg')
+				    .attr('height', height + margin.top + margin.bottom)
+				    .attr('width', width + margin.left + margin.right)
+				    .append('g')
+				    .attr('transform', "translate(" + margin.left + ", " + margin.top + ")");
+
+				  svg.append('g')
+				    .attr('class', 'axis x')
+				    .attr('class', 'bottom')
+				    .attr('transform', "translate(0, " + height + ")")
+				    .call(xAxis);
+
+				  svg.append('g')
+				    .attr('class', 'axis y')
+				    .call(yAxis);
+
+				  svg.selectAll('.bar')
+				    .data(data)
+				    .enter()
+				    .append('rect')
+				    .attr('fill', '#81c784')
+				    .attr('x', function(d) {
+				      return x(d.name);
+				    })
+				    .attr('y', height)
+				    .attr('height', 0)
+				    .attr('width', x.rangeBand())
+				    .transition()
+				    .duration(1500)
+				    .ease('elastic')
+				    .delay(function(d, i) {
+				      return i * 35;
+				    })
+				    .attr('y', function(d) {
+				      return y(d.value);
+				    })
+				    .attr('height', function(d) {
+				      return height - y(d.value);
+				    });
+				}
+				function Recorrer_articulos_tipo(dataset) {
+				  console.log("recorrer");
+				  //console.log(JSON.stringify(dataset));
+				  var cont = 0,
+				    aux = 0;
+				  var tipo = ["Científico", "Guía Didáctica", "Divulgación", "Folleto / Guía / Manual / Catálogo", "Libros de Actas"]
+				  var json = [];
+
+				  for (var j = 0; j < tipo.length; j++) {
+				    console.log(tipo[j]);
+				    for (i in dataset.books){
+				      //console.log("segundo fo");
+				      //console.log(i);
+				      if(dataset.books[i].book_type==tipo[j]){
+				        cont =cont+1;
+				      }
+				    }
+					if(tipo[j] =="Folleto / Guía / Manual / Catálogo"){
+      					json[j] = {
+     				 	"name": "Guía/Folleto",
+      					"value": cont
+    					};
+    				}else{
+      					json[j] = {
+      					"name": tipo[j],
+      					"value": cont
+    					};
+    				}
+				    console.log("contador");
+				    console.log(cont);
+				    
+				    cont =0;
+				  }
+
+				  console.log(JSON.stringify(json));
+				  return json;
+				}
+
+			function recibe(dataset){
+				  var data=[];
+				  data = Recorrer_articulos_anios(dataset);
+				                         
+				var colors = [
+					'steelblue',
+					'green',
+					'red',
+					'purple'
+				]
+				 
+				 
+				//************************************************************
+				// Create Margins and Axis and hook our zoom function
+				//************************************************************
+				var margin = {top: 20, right: 30, bottom: 30, left: 50},
+				    width = 960 - margin.left - margin.right,
+				    height = 500 - margin.top - margin.bottom;
+					
+				var x = d3.scale.linear()
+				    .domain([0, 240])
+				    .range([0, width]);
+				 
+				var y = d3.scale.linear()
+				    .domain([2000, 2016])
+				    .range([height, 0]);
+					
+				var xAxis = d3.svg.axis()
+				    .scale(x)
+					.tickSize(-height)
+					.tickPadding(10)	
+					.tickSubdivide(true)	
+				    .orient("bottom");	
+					
+				var yAxis = d3.svg.axis()
+				    .scale(y)
+					.tickPadding(10)
+					.tickSize(-width)
+					.tickSubdivide(true)	
+				    .orient("left");
+					
+				var zoom = d3.behavior.zoom()
+				    .x(x)
+				    .y(y)
+				    .scaleExtent([1, 10])
+				    .on("zoom", zoomed1);	
+					
+					
+				 
+					
+					
+				//************************************************************
+				// Generate our SVG object
+				//************************************************************	
+				var svg = d3.select("#chart").append("svg")
+					.call(zoom)
+				    .attr("width", width + margin.left + margin.right)
+				    .attr("height", height + margin.top + margin.bottom)
+					.append("g")
+				    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				 
+				svg.append("g")
+				    .attr("class", "x axis")
+				    .attr("transform", "translate(0," + height + ")")
+				    .call(xAxis);
+				 
+				svg.append("g")
+				    .attr("class", "y axis")
+				    .call(yAxis);
+				 
+				svg.append("g")
+					.attr("class", "y axis")
+					.append("text")
+					.attr("class", "axis-label")
+					.attr("transform", "rotate(-90)")
+					.attr("y", (-margin.left) + 10)
+					.attr("x", -height/2)
+					.text('Axis Label');	
+				 
+				svg.append("clipPath")
+					.attr("id", "clip")
+					.append("rect")
+					.attr("width", width)
+					.attr("height", height);
+					
+					
+					
+					
+					
+				//************************************************************
+				// Create D3 line object and draw data on our SVG object
+				//************************************************************
+				var line = d3.svg.line()
+				    .interpolate("linear")	
+				    .x(function(d) { return x(d.x); })
+				    .y(function(d) { return y(d.y); });		
+					
+				svg.selectAll('.line')
+					.data(data)
+					.enter()
+					.append("path")
+				    .attr("class", "line")
+					.attr("clip-path", "url(#clip)")
+					.attr('stroke', function(d,i){ 			
+						return colors[i%colors.length];
+					})
+				    .attr("d", line);		
+					
+					
+					
+					
+				//************************************************************
+				// Draw points on SVG object based on the data given
+				//************************************************************
+				var points = svg.selectAll('.dots')
+					.data(data)
+					.enter()
+					.append("g")
+				    .attr("class", "dots")
+					.attr("clip-path", "url(#clip)");	
+				 
+				points.selectAll('.dot')
+					.data(function(d, index){ 		
+						var a = [];
+						d.forEach(function(point,i){
+							a.push({'index': index, 'point': point});
+						});		
+						return a;
+					})
+					.enter()
+					.append('circle')
+					.attr('class','dot')
+					.attr("r", 2.5)
+					.attr('fill', function(d,i){ 	
+						return colors[d.index%colors.length];
+					})	
+					.attr("transform", function(d) { 
+						return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+					);
+				                        }
+				 
+				function zoomed1() {
+					svg.select(".x.axis").call(xAxis);
+					svg.select(".y.axis").call(yAxis);   
+					svg.selectAll('path.line').attr('d', line);  
+				 
+					points.selectAll('circle').attr("transform", function(d) { 
+						return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+					);  
+				}
+
+				function Recorrer_articulos_anios(dataset){
+				  var limite =2016,cont=0,aux=0;
+				  var json =[];
+				  for(var i=2000;i<limite;i++){
+				  for(j in dataset.articles){
+				     if(dataset.articles[j].year==i){
+				       cont = cont+1;
+				       }
+				    }
+				                          json[aux]=[{"x":cont,"y":i}];
+				                           aux++;
+				                           cont =0;
+				                         }
+				                         console.log("data");
+				                         console.log(json);
+				                         console.log(JSON.stringify(json));
+				  return json;
+				}
+
+			function recibe2(dataset){
+					  var a,cont=0;
+
+					  $("#Graficar").on("click", function(){
+                        if(cont>0){
+                            $("#chart").remove();
+                            $("#ti").remove();
+                            $("#graficas").append("<div id='ti'><br><h2>Publicaciones por Autor</h2></div><div id ='chart'></div>");
+                            console.log("contador");
+                            console.log(cont);
+                        }
+					    console.log("funcion click");
+					    a =$("#select").val();
+					  if (a != ""){
+					  var a = Recorrer_articulos_anios2(dataset,a);
+					  console.log("Funcion de graficar :D")
+					  //console.log(JSON.stringify(a));
+
+					var data =a; 
+					    /*[
+					  ["oranges",5]
+					];*/
+
+
+					var chart = document.getElementById("chart"),
+					    axisMargin = 20,
+					    margin = 1,
+					    valueMargin = 4,
+					    width = chart.offsetWidth,
+					    height = chart.offsetHeight,
+					    barHeight = (height-axisMargin-margin*2)* 0.4/data.length,
+					    barPadding = (height-axisMargin-margin*2)*0.6/data.length,
+					    data, bar, svg, scale, xAxis, labelWidth = 0;
+
+					max = d3.max(data.map(function(i){ 
+					  return i[1];
+					}));
+
+					svg = d3.select(chart)
+					  .append("svg")
+					  .attr("width", width)
+					  .attr("height", 400);
+
+
+					bar = svg.selectAll("g")
+					  .data(data)
+					  .enter()
+					  .append("g");
+
+					bar.attr("class", "bar")
+					  .attr("cx",0)
+					  .attr("transform", function(d, i) { 
+					     return "translate(" + margin + "," + (i * (barHeight + barPadding) + barPadding) + ")";
+					  });
+
+					bar.append("text")
+					  .attr("class", "label")
+					  .attr("y", barHeight / 2)
+					  .attr("dy", ".35em") //vertical align middle
+					  .text(function(d){
+					    return d[0];
+					  }).each(function() {
+					    labelWidth = Math.ceil(Math.max(labelWidth, this.getBBox().width));
+					  });
+
+					scale = d3.scale.linear()
+					  .domain([0, max])
+					  .range([0, width - margin*2 - labelWidth]);
+
+					xAxis = d3.svg.axis()
+					  .scale(scale)
+					  .tickSize(-height + 2*margin + axisMargin)
+					  .orient("bottom");
+
+					bar.append("rect")
+					  .attr("transform", "translate("+labelWidth+", 0)")
+					  .attr("height", barHeight)
+					  .attr("width", function(d){
+					    return scale(d[1]);
+					  });
+
+					bar.append("text")
+					  .attr("class", "value")
+					  .attr("y", barHeight / 2)
+					  .attr("dx", -valueMargin + labelWidth) //margin right
+					  .attr("dy", ".35em") //vertical align middle
+					  .attr("text-anchor", "end")
+					  .text(function(d){
+					    return d[1];
+					  })
+					 .attr("x", function(d){
+					    var width = this.getBBox().width;
+					    return Math.max(width + valueMargin, scale(d[1]));
+					  });
+
+					svg.insert("g",":first-child")
+					 .attr("class", "axis")
+					 .attr("transform", "translate(" + (margin + labelWidth) + ","+ (height - axisMargin - margin)+")")
+					 .call(xAxis);
+					  }
+                      cont= cont+1;
+					  });
+					  
+					}
+
+					function Recorrer_articulos_anios2(dataset,a){
+					  console.log("funcion recorrer a");
+					  console.log(a);
+					  var name_author="KARINA ESPERANZA CANON BELTRAN";
+					  var cont = 0, json=[];
+					  for (i in dataset.articles){
+					  //console.log(dataset.articles[i].authors[0].author);
+					    //console.log(i);
+					    for (j in dataset.articles[i].authors){
+					      console.log(j);
+					      if (dataset.articles[i].authors[j].author==a){
+					        cont = cont+1;
+					        console.log(cont);
+					      }
+					    }
+					    
+					  }
+					  console.log(cont);
+					  console.log("al menos llamame :/");
+					  json = [[a,cont]];
+					  //console.log(JSON.stringify(json));
+					  //console.log(json[0])
+					  //console.log(json.length);
+					  return json;
+					}
+
+			function recibe3(dataset){
+                var cont =0;
+				$("#Graficar").on("click", function(){
+                    if(cont>0){
+                            $("#chart").remove();
+                            $("#ti").remove();
+                            $("#graficas").append("<div id='ti'><br><h2>Publicaciones por Países</h2></div><div id ='chart'></div>");
+                            console.log("contador");
+                            console.log(cont);
+                        }
+                    cont =cont +1;
+					a =$("#select").val();
+					//$("#pato").append("<h2>Publicaciones por Países</h2>");
+
+					  var ar=[], data=[];
+					  ar = Recorrer_articulos_anios3(dataset,a);
+					  console.log("data");
+					  var data = [ar];
+					  //console.log(JSON.stringify(data));
+					  /*
+					  var data = 	[
+						[{'x':1,'y':0},{'x':3,'y':8},{'x':2,'y':10},{'x':4,'y':0},{'x':5,'y':6},{'x':6,'y':11},{'x':7,'y':9},{'x':8,'y':4},{'x':9,'y':11},{'x':10,'y':1}]
+					]; */
+					 var colors = [
+						'steelblue',
+						'green',
+						'red',
+						'purple'
+					]
+					 
+					 
+					//************************************************************
+					// Create Margins and Axis and hook our zoom function
+					//************************************************************
+					var margin = {top: 20, right: 30, bottom: 30, left: 50},
+					    width = 960 - margin.left - margin.right,
+					    height = 500 - margin.top - margin.bottom;
+						
+					var x = d3.scale.linear()
+					    .domain([0, 120])
+					    .range([0, width]);
+					 
+					var y = d3.scale.linear()
+					    .domain([2000, 2016])
+					    .range([height, 0]);
+						
+					var xAxis = d3.svg.axis()
+					    .scale(x)
+						.tickSize(-height)
+						.tickPadding(10)	
+						.tickSubdivide(true)	
+					    .orient("bottom");	
+						
+					var yAxis = d3.svg.axis()
+					    .scale(y)
+						.tickPadding(10)
+						.tickSize(-width)
+						.tickSubdivide(true)	
+					    .orient("left");
+						
+					var zoom = d3.behavior.zoom()
+					    .x(x)
+					    .y(y)
+					    .scaleExtent([1, 10])
+					    .on("zoom", zoomed);	
+						
+						
+					 
+						
+						
+					//************************************************************
+					// Generate our SVG object
+					//************************************************************	
+					var svg = d3.select("#chart").append("svg")
+						.call(zoom)
+					    .attr("width", width + margin.left + margin.right)
+					    .attr("height", height + margin.top + margin.bottom)
+						.append("g")
+					    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+					 
+					svg.append("g")
+					    .attr("class", "x axis")
+					    .attr("transform", "translate(0," + height + ")")
+					    .call(xAxis);
+					 
+					svg.append("g")
+					    .attr("class", "y axis")
+					    .call(yAxis);
+					 
+					svg.append("g")
+						.attr("class", "y axis")
+						.append("text")
+						.attr("class", "axis-label")
+						.attr("transform", "rotate(-90)")
+						.attr("y", (-margin.left) + 10)
+						.attr("x", -height/2)
+						.text('Axis Label');	
+					 
+					svg.append("clipPath")
+						.attr("id", "clip")
+						.append("rect")
+						.attr("width", width)
+						.attr("height", height);
+						
+						
+						
+						
+						
+					//************************************************************
+					// Create D3 line object and draw data on our SVG object
+					//************************************************************
+					var line = d3.svg.line()
+					    .interpolate("linear")	
+					    .x(function(d) { return x(d.x); })
+					    .y(function(d) { return y(d.y); });		
+						
+					svg.selectAll('.line')
+						.data(data)
+						.enter()
+						.append("path")
+					    .attr("class", "line")
+						.attr("clip-path", "url(#clip)")
+						.attr('stroke', function(d,i){ 			
+							return colors[i%colors.length];
+						})
+					    .attr("d", line);		
+						
+						
+						
+						
+					//************************************************************
+					// Draw points on SVG object based on the data given
+					//************************************************************
+					var points = svg.selectAll('.dots')
+						.data(data)
+						.enter()
+						.append("g")
+					    .attr("class", "dots")
+						.attr("clip-path", "url(#clip)");	
+					 
+					points.selectAll('.dot')
+						.data(function(d, index){ 		
+							var a = [];
+							d.forEach(function(point,i){
+								a.push({'index': index, 'point': point});
+							});		
+							return a;
+						})
+						.enter()
+						.append('circle')
+						.attr('class','dot')
+						.attr("r", 2.5)
+						.attr('fill', function(d,i){ 	
+							return colors[d.index%colors.length];
+						})	
+						.attr("transform", function(d) { 
+							return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+						);                    
+					                       }); }
+
+					 
+					function zoomed() {
+						svg.select(".x.axis").call(xAxis);
+						svg.select(".y.axis").call(yAxis);   
+						svg.selectAll('path.line').attr('d', line);  
+					 
+						points.selectAll('circle').attr("transform", function(d) { 
+							return "translate(" + x(d.point.x) + "," + y(d.point.y) + ")"; }
+						);  
+					}
+
+					function Recorrer_articulos_anios3(dataset,a){
+
+					  var limite =2016,cont=0,aux=0;
+					  var json =[];
+					  for(var i=2000;i<limite;i++){
+					  for(j in dataset.articles){
+					    if(dataset.articles[j].country==a){
+					      if(dataset.articles[j].year==i){
+					       cont = cont+1;
+					       }
+					    }
+					     
+					    }
+					                          json[aux]={"x":cont,"y":i};
+					                           aux++;
+					                           cont =0;
+					                         }
+					                         console.log("data");
+					                         console.log(json);
+					                         //console.log(JSON.stringify(json));
+					  return json;
+					}
+
+</script>
+<br><br><br><br><br>
+<div class="container">
+    <div class="col-sm-8 col-sm-offset-2 text-center">
+      <h2>UTPL | RICARDO GALARZA</h2>
+      
+      <hr>
+      <h4>
+        Diseño de Graficos Usando D3
+      </h4>
+      <p>Contactos en Redes Sociales</p>
+      <hr>
+      <ul class="list-inline center-block">
+        <li> <a href='https://plus.google.com/u/0/104078380413506498085/posts' target='_blank'><img alt='Sígueme en Google+' height='28' src='https://googledrive.com/host/0Bwgc28XHjPA2OTZmaW5LY3JPdXM' width='28'/></a></li>
+        <li><a href='https://www.facebook.com/rick.ga.37' target='_blank'><img alt='Sígueme en Facebook' height='30' src='https://googledrive.com/host/0Bwgc28XHjPA2OWpfdWU3S2M0M2M/' width='30'/></a></li>
+        <li><a href='https://twitter.com/dark_rick_' target='_blank'><img alt='Sígueme en Facebook' height='28' src='https://googledrive.com/host/0Bwgc28XHjPA2VURFcDVLNlJxTVk/' width='28'/></a></li>
+        <li><a href='http://feeds.feedburner.com/diariosdelanube' target='_blank'><img alt='Sigue mi Feed' height='28' src='https://googledrive.com/host/0Bwgc28XHjPA2NEVDM2M2blVCa2M/' width='28'/></a> </li>
+      </ul>
+      
+    </div><!--/col-->
+</div><!--/container-->
+  
+</div><!--/wrap-->
+
+<div id="footer">
+  <div class="container">
+    <p class="text-muted">Encuentra este proyecton en <a href="http://www.bootply.com">GitHub</a></p>
+  </div>
+</div>
+
+<ul class="nav pull-right scroll-top">
+  <li><a href="#" title="Scroll to top"><i class="glyphicon glyphicon-chevron-up"></i></a></li>
+</ul>
+</body>
+</html>
